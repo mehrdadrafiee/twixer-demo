@@ -23,6 +23,7 @@ function main(){
             var tweets = res.tally;
             tweets.forEach(function(tweet){
                 $(".tweets").append($("<p>").text("'"+tweet.text+"' Yes: "+tweet.yes+" No: "+tweet.no));
+                doneVoting(tweet);
             });
         });
     };
@@ -41,7 +42,6 @@ function main(){
 
     //Event handler for yes votes
     var upvoteClick = function(){
-        console.log("you hit yes");
         var $tweet = $(this).parent(),
             text = $tweet.find("span").text();
 
@@ -51,13 +51,19 @@ function main(){
 
     // //Event handler for no votes
     var downvoteClick = function(){
-        console.log("you hit no");
         var $tweet = $(this).parent(),
             text = $tweet.find("span").text();
 
         $.post("no",{ tweet: text });
         loadVotes();
     };
+
+    function doneVoting(tweet){        
+        if(tweet.status === "post"){
+            console.log("posting to twitter");
+            $.post("post",{tweet: tweet.text});
+        }
+    }
 
     // //Prepares and return a tweet html object
     function createTweetHTML(text){

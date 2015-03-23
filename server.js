@@ -41,18 +41,28 @@ app.post("/votes", function(req,res){
     res.json(votes);
 });
 
-app.post('/yes',function(req,res){
+app.post("/yes",function(req,res){
     var usrVote = { user: currUsr, vote: 1, tweet: req.body.tweet };
     twixer.processVote(usrVote);
 });
 
-app.post('/no',function(req,res){
+app.post("/no",function(req,res){
     var usrVote = { user: currUsr, vote: 0, tweet: req.body.tweet };
     twixer.processVote(usrVote);
 });
 
-app.post('/tally', function(req,res){
+app.post("/tally", function(req,res){
     res.json(twixer.getTally());
+});
+
+app.post("/post", function(req,res){
+    console.log(twitAuth.consumer_key);
+    twitter.post('status/update',
+            {"status": req.body.tweet},
+            function(error,data){
+                console.dir(data);
+            }
+        );
 });
 
 console.log("Server listening on http://localhost:3000");

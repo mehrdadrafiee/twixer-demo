@@ -64,13 +64,27 @@ function processVote(usrVote){
     });
 }
 
+function purgeTweet(tweet){
+    //remove the tweet from the voting pool of all accounts
+    accts.forEach(function(acct){
+        acct.voted.splice(getIndexOfTweet(tweet,acct.voted), 1);        
+    });
+
+    //remove the tweet from global tweet array
+    tweets.splice(getIndexOfTweet(tweet,tweets), 1);
+
+}
+
 function getTally(){
     var yay,
         nay,
-        tally = [];
+        tally = [],
+        status = "voting",
+        ballotLength;
     tweets.forEach(function(tweet){
         yay=0;
         nay=0;
+        ballotLength = tweet.ballot.length;
         tweet.ballot.forEach(function(vote){
             if(vote === 0){
                 nay++;
@@ -79,10 +93,27 @@ function getTally(){
                 yay++;
             }                
         });
+
+        //Check if voting is done
+        if((yay+nay) === ballotLength){
+            if(yay >= (ballotLength/2 + 1)){
+                console.log("'"+tweet.text+"' will be posted to twitter");
+                status = "post";
+            }
+            else{
+                console.log("'"+tweet.text+"' will be discarded");
+                status = "discard";
+            }
+            
+            //Remove tweet that has finished voting
+            purgeTweet(tweet.text);
+        }
+
         tally.push({
             text: tweet.text,
             yes: yay,
-            no: nay
+            no: nay,
+            status: status
         });
     });
     return { tally: tally };
