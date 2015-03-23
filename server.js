@@ -5,7 +5,7 @@ var express = require("express"),
     currUsr,
     twixer = require("./voting.js"),
     bodyParser = require("body-parser"),
-    twitter = require("simple-twitter"),
+    Twitter = require("twitter"),
     twitAuth = require("./twitterauth.json"),
     app = express();
 
@@ -13,12 +13,8 @@ http.createServer(app).listen(3000);
 
 app.use(express.static(__dirname + "/client"));
 app.use(bodyParser());
-twitter = new twitter(
-    twitAuth.consumer_key, 
-    twitAuth.consumer_secret,
-    twitAuth.access_token_key,
-    twitAuth.access_token_secret
-);
+
+var twitter = new Twitter(twitAuth);
 
 
 app.post("/user/:acct",function(req,res){
@@ -56,13 +52,9 @@ app.post("/tally", function(req,res){
 });
 
 app.post("/post", function(req,res){
-    console.log(twitAuth.consumer_key);
-    twitter.post('status/update',
-            {"status": req.body.tweet},
-            function(error,data){
-                console.dir(data);
-            }
-        );
+    twitter.post('statuses/update', {status: req.body.tweet},  function(error, tweet, response){
+        if(error) throw error;
+    });
 });
 
 console.log("Server listening on http://localhost:3000");
